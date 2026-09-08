@@ -1,0 +1,1116 @@
+{
+  "pyramid": {
+    "schema": "pyrasec.pyramid/1",
+    "root": "/tmp/vulnerable-app",
+    "score": 0.0,
+    "grade": "F",
+    "palette": {
+      "critical": "#EF4565",
+      "warning": "#FBCD63",
+      "secure": "#2EE6B0"
+    },
+    "dimensions": {
+      "base_width": 100.0,
+      "layer_height": 14.0,
+      "height": 28.0,
+      "layer_count": 2
+    },
+    "layers": [
+      {
+        "index": 0,
+        "depth": 1,
+        "y": 0.0,
+        "width": 100.0,
+        "block_count": 10,
+        "band": "critical",
+        "color": "#EF4565",
+        "critical": 8,
+        "warning": 0,
+        "secure": 2,
+        "label": "depth 1 \u00b7 8 folders"
+      },
+      {
+        "index": 1,
+        "depth": 0,
+        "y": 14.0,
+        "width": 57.5,
+        "block_count": 12,
+        "band": "critical",
+        "color": "#EF4565",
+        "critical": 7,
+        "warning": 2,
+        "secure": 3,
+        "label": "project root"
+      }
+    ],
+    "blocks": [
+      {
+        "id": "L1-0",
+        "path": ".env",
+        "name": ".env",
+        "layer": 1,
+        "x": 15.81,
+        "y": 14.0,
+        "z": 0.0,
+        "size": 5.49,
+        "color": "#EF4565",
+        "band": "critical",
+        "severity": "critical",
+        "finding_count": 5,
+        "file_size": 174,
+        "mode": "0666",
+        "findings": [
+          "87a042ede3fdb55e",
+          "d65625f8ade17e1c",
+          "2e67444d045bee67",
+          "e831b11c9ab749b9",
+          "f0ea24bd5c6d098c"
+        ]
+      },
+      {
+        "id": "L1-1",
+        "path": "Dockerfile",
+        "name": "Dockerfile",
+        "layer": 1,
+        "x": 19.3,
+        "y": 14.0,
+        "z": 11.14,
+        "size": 5.51,
+        "color": "#EF4565",
+        "band": "critical",
+        "severity": "critical",
+        "finding_count": 5,
+        "file_size": 185,
+        "mode": "0644",
+        "findings": [
+          "6a74bee8efed1bf6",
+          "4bd123dc157dc4a8",
+          "0d2c8d15ebba17af",
+          "45be28f1014a8caa",
+          "489e99c69c53655c"
+        ]
+      },
+      {
+        "id": "L1-2",
+        "path": "docker-compose.yml",
+        "name": "docker-compose.yml",
+        "layer": 1,
+        "x": 14.38,
+        "y": 14.0,
+        "z": 24.9,
+        "size": 5.58,
+        "color": "#EF4565",
+        "band": "critical",
+        "severity": "critical",
+        "finding_count": 5,
+        "file_size": 235,
+        "mode": "0644",
+        "findings": [
+          "a76006e45725713a",
+          "6b35ccd22765eab9",
+          "17839ba78542628c",
+          "78e96f42e1c57a04",
+          "732ff5d16415ed60"
+        ]
+      },
+      {
+        "id": "L1-3",
+        "path": "nginx.conf",
+        "name": "nginx.conf",
+        "layer": 1,
+        "x": 0.0,
+        "y": 14.0,
+        "z": 15.81,
+        "size": 5.62,
+        "color": "#F97362",
+        "band": "critical",
+        "severity": "high",
+        "finding_count": 6,
+        "file_size": 272,
+        "mode": "0644",
+        "findings": [
+          "a80259e5c1659a7d",
+          "8f0da0c7ff38c44a",
+          "cbade0a4c61bc898",
+          "02fa1cad0219a235",
+          "9c6dfbe067a63446",
+          "10ae550b1dc6d02d"
+        ]
+      },
+      {
+        "id": "L1-4",
+        "path": "requirements.txt",
+        "name": "requirements.txt",
+        "layer": 1,
+        "x": -11.14,
+        "y": 14.0,
+        "z": 19.3,
+        "size": 5.31,
+        "color": "#F97362",
+        "band": "critical",
+        "severity": "high",
+        "finding_count": 3,
+        "file_size": 91,
+        "mode": "0644",
+        "findings": [
+          "061957d4176924f1",
+          "084bffec4dc89fee",
+          "b91e383e659468ba"
+        ]
+      },
+      {
+        "id": "L1-5",
+        "path": "dump.sql",
+        "name": "dump.sql",
+        "layer": 1,
+        "x": -24.9,
+        "y": 14.0,
+        "z": 14.37,
+        "size": 6.17,
+        "color": "#F97362",
+        "band": "critical",
+        "severity": "high",
+        "finding_count": 2,
+        "file_size": 1830,
+        "mode": "0644",
+        "findings": [
+          "5bb3617e948a7193",
+          "cdb712372cb0ef01"
+        ]
+      },
+      {
+        "id": "L1-6",
+        "path": "package.json",
+        "name": "package.json",
+        "layer": 1,
+        "x": -15.81,
+        "y": 14.0,
+        "z": 0.0,
+        "size": 5.45,
+        "color": "#F97362",
+        "band": "critical",
+        "severity": "high",
+        "finding_count": 2,
+        "file_size": 151,
+        "mode": "0644",
+        "findings": [
+          "8a8c12b1de9c600d",
+          "e366758a6ab1a969"
+        ]
+      },
+      {
+        "id": "L1-7",
+        "path": "database.sql.bak",
+        "name": "database.sql.bak",
+        "layer": 1,
+        "x": -19.3,
+        "y": 14.0,
+        "z": -11.14,
+        "size": 6.31,
+        "color": "#FBCD63",
+        "band": "warning",
+        "severity": "medium",
+        "finding_count": 1,
+        "file_size": 2880,
+        "mode": "0644",
+        "findings": [
+          "b1052b886595b140"
+        ]
+      },
+      {
+        "id": "L1-8",
+        "path": "app.log",
+        "name": "app.log",
+        "layer": 1,
+        "x": -14.38,
+        "y": 14.0,
+        "z": -24.9,
+        "size": 6.07,
+        "color": "#8FD9C0",
+        "band": "warning",
+        "severity": "low",
+        "finding_count": 1,
+        "file_size": 1280,
+        "mode": "0644",
+        "findings": [
+          "d9bbbb5c4dc3b067"
+        ]
+      },
+      {
+        "id": "L1-9",
+        "path": ".env.example",
+        "name": ".env.example",
+        "layer": 1,
+        "x": -0.0,
+        "y": 14.0,
+        "z": -15.81,
+        "size": 5.08,
+        "color": "#2EE6B0",
+        "band": "secure",
+        "severity": "info",
+        "finding_count": 0,
+        "file_size": 41,
+        "mode": "0644",
+        "findings": []
+      },
+      {
+        "id": "L1-10",
+        "path": ".pyrasec-cache.json",
+        "name": ".pyrasec-cache.json",
+        "layer": 1,
+        "x": 11.14,
+        "y": 14.0,
+        "z": -19.3,
+        "size": 7.25,
+        "color": "#2EE6B0",
+        "band": "secure",
+        "severity": "info",
+        "finding_count": 0,
+        "file_size": 73877,
+        "mode": "0600",
+        "findings": []
+      },
+      {
+        "id": "L1-11",
+        "path": "README.md",
+        "name": "README.md",
+        "layer": 1,
+        "x": 24.9,
+        "y": 14.0,
+        "z": -14.38,
+        "size": 5.19,
+        "color": "#2EE6B0",
+        "band": "secure",
+        "severity": "info",
+        "finding_count": 0,
+        "file_size": 62,
+        "mode": "0644",
+        "findings": []
+      },
+      {
+        "id": "L0-0",
+        "path": "infra/main.tf",
+        "name": "main.tf",
+        "layer": 0,
+        "x": 27.5,
+        "y": 0.0,
+        "z": 0.0,
+        "size": 5.74,
+        "color": "#EF4565",
+        "band": "critical",
+        "severity": "critical",
+        "finding_count": 6,
+        "file_size": 404,
+        "mode": "0644",
+        "findings": [
+          "e856c87fb83d7159",
+          "c8e9d74dfee4ce30",
+          "ae9925657023e7dd",
+          "a36224e1510f5dd8",
+          "1a3d573ca1a51ee3",
+          "3993b95dd3bd4471"
+        ]
+      },
+      {
+        "id": "L0-1",
+        "path": "k8s/deployment.yaml",
+        "name": "deployment.yaml",
+        "layer": 0,
+        "x": 31.35,
+        "y": 0.0,
+        "z": 22.78,
+        "size": 5.77,
+        "color": "#EF4565",
+        "band": "critical",
+        "severity": "critical",
+        "finding_count": 6,
+        "file_size": 453,
+        "mode": "0644",
+        "findings": [
+          "0d3cba186e39032f",
+          "0cc4c9cc43bb5abd",
+          "ceeaaba40ee82c4b",
+          "e7069f8c104d2aff",
+          "dd080342d0a4ba42",
+          "99a10114907ac0c0"
+        ]
+      },
+      {
+        "id": "L0-2",
+        "path": "app/settings.py",
+        "name": "settings.py",
+        "layer": 0,
+        "x": 15.45,
+        "y": 0.0,
+        "z": 47.55,
+        "size": 5.59,
+        "color": "#EF4565",
+        "band": "critical",
+        "severity": "critical",
+        "finding_count": 4,
+        "file_size": 246,
+        "mode": "0644",
+        "findings": [
+          "0964ec614bc9f2fc",
+          "aab498d89d245ddb",
+          "169e11a71937b2c7",
+          "b2adba5822721bb6"
+        ]
+      },
+      {
+        "id": "L0-3",
+        "path": "public/config.json",
+        "name": "config.json",
+        "layer": 0,
+        "x": -8.5,
+        "y": 0.0,
+        "z": 26.15,
+        "size": 5.28,
+        "color": "#EF4565",
+        "band": "critical",
+        "severity": "critical",
+        "finding_count": 4,
+        "file_size": 82,
+        "mode": "0646",
+        "findings": [
+          "5fab77e5b24c7982",
+          "6b4480fd5d27b77c",
+          "c41d4180d68ee7f8",
+          "d0b90b3fb93eb837"
+        ]
+      },
+      {
+        "id": "L0-4",
+        "path": "scripts/deploy.sh",
+        "name": "deploy.sh",
+        "layer": 0,
+        "x": -31.35,
+        "y": 0.0,
+        "z": 22.78,
+        "size": 5.35,
+        "color": "#EF4565",
+        "band": "critical",
+        "severity": "critical",
+        "finding_count": 4,
+        "file_size": 107,
+        "mode": "0777",
+        "findings": [
+          "bf128f3c12d35b23",
+          "1ea764a3568b2f97",
+          "e6dbb34956f3d23f",
+          "edd341fc60721abc"
+        ]
+      },
+      {
+        "id": "L0-5",
+        "path": "certs/server.key",
+        "name": "server.key",
+        "layer": 0,
+        "x": -50.0,
+        "y": 0.0,
+        "z": 0.0,
+        "size": 5.41,
+        "color": "#EF4565",
+        "band": "critical",
+        "severity": "critical",
+        "finding_count": 3,
+        "file_size": 129,
+        "mode": "0644",
+        "findings": [
+          "c5ba19f0dc764b2f",
+          "30bb848a0bc16a42",
+          "a25aecd262b2cb3a"
+        ]
+      },
+      {
+        "id": "L0-6",
+        "path": "static/backup.env",
+        "name": "backup.env",
+        "layer": 0,
+        "x": -22.25,
+        "y": 0.0,
+        "z": -16.16,
+        "size": 5.17,
+        "color": "#EF4565",
+        "band": "critical",
+        "severity": "critical",
+        "finding_count": 3,
+        "file_size": 57,
+        "mode": "0644",
+        "findings": [
+          "f95b9312a3b6b35c",
+          "9b89d4d7f2987887",
+          "bd095fe79bc7af68"
+        ]
+      },
+      {
+        "id": "L0-7",
+        "path": "app/auth.py",
+        "name": "auth.py",
+        "layer": 0,
+        "x": -11.97,
+        "y": 0.0,
+        "z": -36.85,
+        "size": 5.58,
+        "color": "#EF4565",
+        "band": "critical",
+        "severity": "critical",
+        "finding_count": 2,
+        "file_size": 233,
+        "mode": "0644",
+        "findings": [
+          "5f049af731206c3e",
+          "1dc2f1c913194eae"
+        ]
+      },
+      {
+        "id": "L0-8",
+        "path": "public/index.html",
+        "name": "index.html",
+        "layer": 0,
+        "x": 15.45,
+        "y": 0.0,
+        "z": -47.55,
+        "size": 5.12,
+        "color": "#2EE6B0",
+        "band": "secure",
+        "severity": "info",
+        "finding_count": 0,
+        "file_size": 48,
+        "mode": "0644",
+        "findings": []
+      },
+      {
+        "id": "L0-9",
+        "path": "src/index.js",
+        "name": "index.js",
+        "layer": 0,
+        "x": 22.25,
+        "y": 0.0,
+        "z": -16.16,
+        "size": 5.26,
+        "color": "#2EE6B0",
+        "band": "secure",
+        "severity": "info",
+        "finding_count": 0,
+        "file_size": 77,
+        "mode": "0644",
+        "findings": []
+      }
+    ],
+    "summary": {
+      "total_files": 22,
+      "rendered_blocks": 22,
+      "truncated": 0,
+      "by_band": {
+        "critical": 15,
+        "warning": 2,
+        "secure": 5
+      }
+    }
+  },
+  "tree": {
+    "name": "vulnerable-app",
+    "path": "",
+    "type": "directory",
+    "size": 82914,
+    "findings": 62,
+    "severity": "critical",
+    "band": "critical",
+    "color": "#EF4565",
+    "children": [
+      {
+        "name": "app",
+        "path": "app",
+        "type": "directory",
+        "size": 479,
+        "findings": 6,
+        "severity": "critical",
+        "band": "critical",
+        "color": "#EF4565",
+        "children": [
+          {
+            "name": "auth.py",
+            "path": "app/auth.py",
+            "type": "file",
+            "size": 233,
+            "findings": 2,
+            "severity": "critical",
+            "band": "critical",
+            "color": "#EF4565",
+            "children": []
+          },
+          {
+            "name": "settings.py",
+            "path": "app/settings.py",
+            "type": "file",
+            "size": 246,
+            "findings": 4,
+            "severity": "critical",
+            "band": "critical",
+            "color": "#EF4565",
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "certs",
+        "path": "certs",
+        "type": "directory",
+        "size": 129,
+        "findings": 3,
+        "severity": "critical",
+        "band": "critical",
+        "color": "#EF4565",
+        "children": [
+          {
+            "name": "server.key",
+            "path": "certs/server.key",
+            "type": "file",
+            "size": 129,
+            "findings": 3,
+            "severity": "critical",
+            "band": "critical",
+            "color": "#EF4565",
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "infra",
+        "path": "infra",
+        "type": "directory",
+        "size": 404,
+        "findings": 6,
+        "severity": "critical",
+        "band": "critical",
+        "color": "#EF4565",
+        "children": [
+          {
+            "name": "main.tf",
+            "path": "infra/main.tf",
+            "type": "file",
+            "size": 404,
+            "findings": 6,
+            "severity": "critical",
+            "band": "critical",
+            "color": "#EF4565",
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "k8s",
+        "path": "k8s",
+        "type": "directory",
+        "size": 453,
+        "findings": 6,
+        "severity": "critical",
+        "band": "critical",
+        "color": "#EF4565",
+        "children": [
+          {
+            "name": "deployment.yaml",
+            "path": "k8s/deployment.yaml",
+            "type": "file",
+            "size": 453,
+            "findings": 6,
+            "severity": "critical",
+            "band": "critical",
+            "color": "#EF4565",
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "public",
+        "path": "public",
+        "type": "directory",
+        "size": 130,
+        "findings": 4,
+        "severity": "critical",
+        "band": "critical",
+        "color": "#EF4565",
+        "children": [
+          {
+            "name": "config.json",
+            "path": "public/config.json",
+            "type": "file",
+            "size": 82,
+            "findings": 4,
+            "severity": "critical",
+            "band": "critical",
+            "color": "#EF4565",
+            "children": []
+          },
+          {
+            "name": "index.html",
+            "path": "public/index.html",
+            "type": "file",
+            "size": 48,
+            "findings": 0,
+            "severity": "info",
+            "band": "secure",
+            "color": "#2EE6B0",
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "scripts",
+        "path": "scripts",
+        "type": "directory",
+        "size": 107,
+        "findings": 4,
+        "severity": "critical",
+        "band": "critical",
+        "color": "#EF4565",
+        "children": [
+          {
+            "name": "deploy.sh",
+            "path": "scripts/deploy.sh",
+            "type": "file",
+            "size": 107,
+            "findings": 4,
+            "severity": "critical",
+            "band": "critical",
+            "color": "#EF4565",
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "src",
+        "path": "src",
+        "type": "directory",
+        "size": 77,
+        "findings": 0,
+        "severity": "info",
+        "band": "secure",
+        "color": "#2EE6B0",
+        "children": [
+          {
+            "name": "index.js",
+            "path": "src/index.js",
+            "type": "file",
+            "size": 77,
+            "findings": 0,
+            "severity": "info",
+            "band": "secure",
+            "color": "#2EE6B0",
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "static",
+        "path": "static",
+        "type": "directory",
+        "size": 57,
+        "findings": 3,
+        "severity": "critical",
+        "band": "critical",
+        "color": "#EF4565",
+        "children": [
+          {
+            "name": "backup.env",
+            "path": "static/backup.env",
+            "type": "file",
+            "size": 57,
+            "findings": 3,
+            "severity": "critical",
+            "band": "critical",
+            "color": "#EF4565",
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": ".env",
+        "path": ".env",
+        "type": "file",
+        "size": 174,
+        "findings": 5,
+        "severity": "critical",
+        "band": "critical",
+        "color": "#EF4565",
+        "children": []
+      },
+      {
+        "name": ".env.example",
+        "path": ".env.example",
+        "type": "file",
+        "size": 41,
+        "findings": 0,
+        "severity": "info",
+        "band": "secure",
+        "color": "#2EE6B0",
+        "children": []
+      },
+      {
+        "name": ".pyrasec-cache.json",
+        "path": ".pyrasec-cache.json",
+        "type": "file",
+        "size": 73877,
+        "findings": 0,
+        "severity": "info",
+        "band": "secure",
+        "color": "#2EE6B0",
+        "children": []
+      },
+      {
+        "name": "Dockerfile",
+        "path": "Dockerfile",
+        "type": "file",
+        "size": 185,
+        "findings": 5,
+        "severity": "critical",
+        "band": "critical",
+        "color": "#EF4565",
+        "children": []
+      },
+      {
+        "name": "README.md",
+        "path": "README.md",
+        "type": "file",
+        "size": 62,
+        "findings": 0,
+        "severity": "info",
+        "band": "secure",
+        "color": "#2EE6B0",
+        "children": []
+      },
+      {
+        "name": "app.log",
+        "path": "app.log",
+        "type": "file",
+        "size": 1280,
+        "findings": 1,
+        "severity": "low",
+        "band": "warning",
+        "color": "#8FD9C0",
+        "children": []
+      },
+      {
+        "name": "database.sql.bak",
+        "path": "database.sql.bak",
+        "type": "file",
+        "size": 2880,
+        "findings": 1,
+        "severity": "medium",
+        "band": "warning",
+        "color": "#FBCD63",
+        "children": []
+      },
+      {
+        "name": "docker-compose.yml",
+        "path": "docker-compose.yml",
+        "type": "file",
+        "size": 235,
+        "findings": 5,
+        "severity": "critical",
+        "band": "critical",
+        "color": "#EF4565",
+        "children": []
+      },
+      {
+        "name": "dump.sql",
+        "path": "dump.sql",
+        "type": "file",
+        "size": 1830,
+        "findings": 2,
+        "severity": "high",
+        "band": "critical",
+        "color": "#F97362",
+        "children": []
+      },
+      {
+        "name": "nginx.conf",
+        "path": "nginx.conf",
+        "type": "file",
+        "size": 272,
+        "findings": 6,
+        "severity": "high",
+        "band": "critical",
+        "color": "#F97362",
+        "children": []
+      },
+      {
+        "name": "package.json",
+        "path": "package.json",
+        "type": "file",
+        "size": 151,
+        "findings": 2,
+        "severity": "high",
+        "band": "critical",
+        "color": "#F97362",
+        "children": []
+      },
+      {
+        "name": "requirements.txt",
+        "path": "requirements.txt",
+        "type": "file",
+        "size": 91,
+        "findings": 3,
+        "severity": "high",
+        "band": "critical",
+        "color": "#F97362",
+        "children": []
+      }
+    ]
+  },
+  "heatmap": {
+    "schema": "pyrasec.heatmap/1",
+    "severities": [
+      "critical",
+      "high",
+      "medium",
+      "low",
+      "info"
+    ],
+    "rows": [
+      {
+        "directory": ".",
+        "counts": {
+          "critical": 7,
+          "high": 13,
+          "medium": 11,
+          "low": 2,
+          "info": 0
+        },
+        "total": 33
+      },
+      {
+        "directory": "app",
+        "counts": {
+          "critical": 5,
+          "high": 1,
+          "medium": 0,
+          "low": 0,
+          "info": 0
+        },
+        "total": 6
+      },
+      {
+        "directory": "infra",
+        "counts": {
+          "critical": 4,
+          "high": 2,
+          "medium": 0,
+          "low": 0,
+          "info": 0
+        },
+        "total": 6
+      },
+      {
+        "directory": "k8s",
+        "counts": {
+          "critical": 1,
+          "high": 4,
+          "medium": 1,
+          "low": 0,
+          "info": 0
+        },
+        "total": 6
+      },
+      {
+        "directory": "public",
+        "counts": {
+          "critical": 2,
+          "high": 1,
+          "medium": 1,
+          "low": 0,
+          "info": 0
+        },
+        "total": 4
+      },
+      {
+        "directory": "scripts",
+        "counts": {
+          "critical": 2,
+          "high": 1,
+          "medium": 1,
+          "low": 0,
+          "info": 0
+        },
+        "total": 4
+      },
+      {
+        "directory": "static",
+        "counts": {
+          "critical": 2,
+          "high": 0,
+          "medium": 1,
+          "low": 0,
+          "info": 0
+        },
+        "total": 3
+      },
+      {
+        "directory": "certs",
+        "counts": {
+          "critical": 1,
+          "high": 1,
+          "medium": 1,
+          "low": 0,
+          "info": 0
+        },
+        "total": 3
+      }
+    ]
+  },
+  "attack_surface": {
+    "schema": "pyrasec.attack-surface/1",
+    "surfaces": [
+      {
+        "name": "Infrastructure misconfiguration",
+        "description": "Deployment settings that weaken isolation or expose services.",
+        "severity": "critical",
+        "color": "#EF4565",
+        "finding_count": 21,
+        "paths": [
+          "Dockerfile",
+          "docker-compose.yml",
+          "infra/main.tf",
+          "k8s/deployment.yaml"
+        ],
+        "rules": [
+          "DOC001",
+          "DOC002",
+          "DOC003",
+          "DOC004",
+          "DOC005",
+          "DOC010",
+          "DOC011",
+          "DOC012",
+          "DOC013",
+          "DOC014",
+          "K8S001",
+          "K8S002",
+          "K8S003",
+          "K8S004",
+          "K8S005",
+          "K8S006",
+          "TF001",
+          "TF002",
+          "TF003",
+          "TF004",
+          "TF008"
+        ]
+      },
+      {
+        "name": "Credential exposure",
+        "description": "Secrets recoverable from the repository or filesystem.",
+        "severity": "critical",
+        "color": "#EF4565",
+        "finding_count": 20,
+        "paths": [
+          ".env",
+          "Dockerfile",
+          "app/auth.py",
+          "app/settings.py",
+          "certs/server.key",
+          "docker-compose.yml",
+          "infra/main.tf",
+          "public/config.json",
+          "scripts/deploy.sh",
+          "static/backup.env"
+        ],
+        "rules": [
+          "DOC003",
+          "DOC014",
+          "GIT004",
+          "SEC001",
+          "SEC002",
+          "SEC003",
+          "SEC004",
+          "SEC006"
+        ]
+      },
+      {
+        "name": "Privilege escalation",
+        "description": "Local footholds that can be widened to root or host access.",
+        "severity": "critical",
+        "color": "#EF4565",
+        "finding_count": 13,
+        "paths": [
+          ".env",
+          "Dockerfile",
+          "certs/server.key",
+          "docker-compose.yml",
+          "dump.sql",
+          "public",
+          "public/config.json",
+          "scripts/deploy.sh",
+          "static/backup.env"
+        ],
+        "rules": [
+          "DOC002",
+          "DOC005",
+          "DOC010",
+          "DOC012",
+          "DOC013",
+          "FS001",
+          "FS002"
+        ]
+      },
+      {
+        "name": "Externally reachable files",
+        "description": "Files an unauthenticated request can fetch directly.",
+        "severity": "critical",
+        "color": "#EF4565",
+        "finding_count": 5,
+        "paths": [
+          ".env",
+          ".git",
+          "nginx.conf",
+          "public/config.json",
+          "static/backup.env"
+        ],
+        "rules": [
+          "FS020",
+          "GIT001",
+          "GIT004",
+          "WEB010"
+        ]
+      },
+      {
+        "name": "Supply chain",
+        "description": "Third-party code paths that can introduce attacker-controlled logic.",
+        "severity": "high",
+        "color": "#F97362",
+        "finding_count": 7,
+        "paths": [
+          "Dockerfile",
+          "package.json",
+          "requirements.txt"
+        ],
+        "rules": [
+          "DEP001",
+          "DEP003",
+          "DEP004",
+          "DOC001",
+          "DOC004"
+        ]
+      },
+      {
+        "name": "Server configuration",
+        "description": "Web-tier settings that change what is served and to whom.",
+        "severity": "high",
+        "color": "#F97362",
+        "finding_count": 6,
+        "paths": [
+          "nginx.conf"
+        ],
+        "rules": [
+          "WEB001",
+          "WEB002",
+          "WEB003",
+          "WEB005",
+          "WEB006",
+          "WEB010"
+        ]
+      }
+    ]
+  }
+}
