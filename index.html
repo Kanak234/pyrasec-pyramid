@@ -1,0 +1,1096 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PyraSec — Visualize. Detect. Secure.</title>
+
+<style>
+  :root {
+    --bg:        #0B131F;
+    --plate:     #16233A;
+    --grid:      #1B2C45;
+    --steel:     #7F9DB9;
+    --ink:       #DCE6F2;
+    --muted:     #788CA6;
+    --crit:      #F2415A;
+    --high:      #FF6B3D;
+    --warn:      #F5A524;
+    --clean:     #3FBF7F;
+
+    --mono: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    grid-template-rows: auto 1fr;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ---------- masthead ---------- */
+
+  header {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: baseline;
+    gap: 18px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--grid);
+  }
+
+  .wordmark {
+    font-family: var(--mono);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+  }
+
+  .tagline {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .toolbar { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+
+  button, .filebtn {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--steel);
+    background: transparent;
+    border: 1px solid var(--grid);
+    padding: 7px 12px;
+    cursor: pointer;
+    transition: color .15s, border-color .15s, background .15s;
+  }
+
+  button:hover, .filebtn:hover {
+    color: var(--ink);
+    border-color: var(--steel);
+    background: #131F31;
+  }
+
+  button:focus-visible, .filebtn:focus-within {
+    outline: 2px solid var(--warn);
+    outline-offset: 2px;
+  }
+
+  .filebtn { display: inline-block; }
+  .filebtn input { display: none; }
+
+  /* ---------- stage ---------- */
+
+  #stage { position: relative; overflow: hidden; }
+  #view  { display: block; width: 100%; height: 100%; cursor: grab; }
+  #view.dragging { cursor: grabbing; }
+  #view:focus-visible { outline: 2px solid var(--warn); outline-offset: -2px; }
+
+  /* score plate, engraved into the corner of the stage */
+  .plate {
+    position: absolute;
+    top: 22px;
+    left: 24px;
+    pointer-events: none;
+  }
+
+  .score {
+    font-family: var(--mono);
+    font-size: 74px;
+    line-height: .82;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+  }
+
+  .score span { font-size: 24px; letter-spacing: 0; color: var(--muted); }
+
+  .grade {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 9px;
+  }
+
+  .rootpath {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--muted);
+    margin-top: 3px;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .legend {
+    position: absolute;
+    left: 24px;
+    bottom: 20px;
+    display: flex;
+    gap: 16px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--muted);
+    pointer-events: none;
+  }
+
+  .legend i {
+    display: inline-block;
+    width: 9px; height: 9px;
+    margin-right: 6px;
+    vertical-align: -1px;
+  }
+
+  .hint {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #4C5F79;
+    pointer-events: none;
+  }
+
+  /* ---------- empty state ---------- */
+
+  .empty {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    text-align: center;
+    padding: 30px;
+    background: rgba(11,19,31,.94);
+  }
+
+  body.no-data .empty { display: flex; }
+
+  .empty h2 {
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  .empty p { color: var(--muted); font-size: 13px; max-width: 430px; margin: 0; line-height: 1.6; }
+
+  .empty code {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--warn);
+    background: #121D2E;
+    padding: 2px 6px;
+  }
+
+  /* ---------- rail ---------- */
+
+  aside {
+    border-left: 1px solid var(--grid);
+    overflow-y: auto;
+    padding: 18px 18px 40px;
+  }
+
+  .rail-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 22px 0 10px;
+  }
+
+  .rail-title:first-child { margin-top: 0; }
+
+  .counts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--grid); border: 1px solid var(--grid); }
+
+  .count { background: var(--bg); padding: 9px 8px; }
+  .count b { display: block; font-family: var(--mono); font-size: 19px; font-weight: 700; }
+  .count small { font-family: var(--mono); font-size: 8.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+
+  .row {
+    width: 100%;
+    text-align: left;
+    display: block;
+    border: 0;
+    border-left: 2px solid transparent;
+    border-bottom: 1px solid #121E2E;
+    padding: 9px 10px;
+    background: transparent;
+    text-transform: none;
+    letter-spacing: 0;
+    font-family: var(--sans);
+    font-size: 12px;
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  .row:hover { background: #121D2E; }
+  .row.on { background: #15233A; }
+
+  .row .rid {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 3px;
+  }
+
+  .row .rwhere { font-family: var(--mono); font-size: 10.5px; color: var(--steel); margin-top: 3px; word-break: break-all; }
+
+  .detail { border: 1px solid var(--grid); padding: 12px; font-size: 12px; line-height: 1.65; }
+  .detail .path { font-family: var(--mono); font-size: 11px; color: var(--ink); word-break: break-all; }
+  .detail .meta { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-top: 7px; }
+  .detail p { margin: 8px 0 0; color: var(--muted); }
+
+  .layer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 5px 0;
+    color: var(--steel);
+  }
+
+  .layer b { color: var(--ink); font-weight: 400; }
+  .layer .bar { flex: 1; height: 3px; background: var(--grid); position: relative; }
+  .layer .bar i { position: absolute; inset: 0 auto 0 0; background: var(--steel); }
+  .layer .n { color: var(--muted); font-size: 10px; }
+
+  ::-webkit-scrollbar { width: 9px; }
+  ::-webkit-scrollbar-thumb { background: #1D2E47; }
+  ::-webkit-scrollbar-track { background: transparent; }
+
+  /* ---------- narrow screens ---------- */
+
+  @media (max-width: 860px) {
+    body { grid-template-columns: 1fr; grid-template-rows: auto 58vh 1fr; overflow: auto; }
+    aside { border-left: 0; border-top: 1px solid var(--grid); }
+    .score { font-size: 54px; }
+  }
+</style>
+
+<header>
+  <div class="wordmark">PyraSec</div>
+  <div class="tagline">Visualize · Detect · Secure</div>
+  <div class="toolbar">
+    <label class="filebtn" tabindex="0">Open scan JSON<input type="file" id="pick" accept=".json,application/json"></label>
+    <button id="sample">Load sample</button>
+    <button id="reset">Reset view</button>
+    <button id="spin">Spin: off</button>
+    <button id="shot">Save image</button>
+  </div>
+</header>
+
+<main id="stage">
+  <canvas id="view" tabindex="0" aria-label="3D pyramid of the scanned project"></canvas>
+
+  <div class="plate">
+    <div class="score" id="score">--<span>/100</span></div>
+    <div class="grade" id="grade">no scan loaded</div>
+    <div class="rootpath" id="rootpath"></div>
+  </div>
+
+  <div class="legend">
+    <span><i style="background:var(--crit)"></i>critical / high</span>
+    <span><i style="background:var(--warn)"></i>medium / low</span>
+    <span><i style="background:var(--clean)"></i>clean</span>
+  </div>
+
+  <div class="hint">drag to orbit · scroll to zoom · click a block</div>
+
+  <div class="empty">
+    <h2>No scan loaded</h2>
+    <p>
+      Generate the data with <code>pyrasec pyramid . &gt; pyramid.json</code>,
+      then open that file with the button above — or drop it anywhere on this page.
+      Press <b>Load sample</b> to see the viewer with example data.
+    </p>
+  </div>
+</main>
+
+<aside>
+  <div class="rail-title">Findings by severity</div>
+  <div class="counts">
+    <div class="count"><b id="c-crit" style="color:var(--crit)">0</b><small>Critical</small></div>
+    <div class="count"><b id="c-high" style="color:var(--high)">0</b><small>High</small></div>
+    <div class="count"><b id="c-med"  style="color:var(--warn)">0</b><small>Medium</small></div>
+    <div class="count"><b id="c-low"  style="color:var(--warn)">0</b><small>Low</small></div>
+  </div>
+
+  <div class="rail-title">Selected block</div>
+  <div class="detail" id="detail">
+    <div class="path">Nothing selected</div>
+    <p>Click any block in the pyramid to inspect the file it represents.</p>
+  </div>
+
+  <div class="rail-title" id="fh">Findings</div>
+  <div id="findings"></div>
+
+  <div class="rail-title">Layers</div>
+  <div id="layers"></div>
+</aside>
+
+<script>
+"use strict";
+
+/* ==================================================================
+   PyraSec viewer — zero dependencies, renders offline from file://
+   Projection and rasterisation are hand-rolled on a 2D canvas so the
+   page never needs a network fetch, matching the scanner's own
+   no-dependency stance.
+   ================================================================== */
+
+const cv   = document.getElementById("view");
+const ctx  = cv.getContext("2d");
+const body = document.body;
+
+const COLOR = {
+  crit:  "#F2415A",
+  high:  "#FF6B3D",
+  warn:  "#F5A524",
+  clean: "#3FBF7F",
+  plate: "#16233A",
+  steel: "#7F9DB9",
+  grid:  "#1B2C45",
+  muted: "#788CA6",
+  ink:   "#DCE6F2"
+};
+
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---------------- camera ---------------- */
+
+const camDefault = { yaw: -0.62, pitch: 0.52, dist: 900, focal: 900 };
+let cam = Object.assign({}, camDefault);
+let spinning = false;
+
+/* ---------------- scene ---------------- */
+
+let boxes  = [];   // renderable blocks
+let scene  = null; // normalised scan
+let hovered = null, selected = null;
+
+/* ==================================================================
+   1. Normalising whatever JSON the CLI produced
+   ================================================================== */
+
+const SEV_TIER = {
+  critical: "crit", crit: "crit", severe: "crit", blocker: "crit",
+  high: "high", error: "high", major: "high",
+  medium: "med", moderate: "med", warning: "med", warn: "med",
+  low: "low", minor: "low", info: "low", informational: "low", note: "low"
+};
+
+const TIER_RANK  = { clean: 0, low: 1, med: 2, high: 3, crit: 4 };
+const TIER_COLOR = { clean: COLOR.clean, low: COLOR.warn, med: COLOR.warn, high: COLOR.high, crit: COLOR.crit };
+
+function tierOf(v) {
+  if (v == null) return null;
+  const k = String(v).trim().toLowerCase();
+  return SEV_TIER[k] || null;
+}
+
+function looksLikePath(s) {
+  return typeof s === "string" && s.length > 0 && s.length < 400 &&
+         (s.includes("/") || /\.[A-Za-z0-9]{1,8}$/.test(s));
+}
+
+/* Walk the whole document and pull out anything that resembles a file
+   record or a finding. Tolerant on purpose — the exact shape of
+   pyramid.json varies with the emitter. */
+function harvest(raw) {
+  const files = new Map();
+  const findings = [];
+  const seen = new Set();
+
+  function pathIn(o) {
+    for (const k of ["path", "file", "filepath", "file_path", "relpath",
+                     "relative_path", "location", "target", "name"]) {
+      if (looksLikePath(o[k])) return String(o[k]);
+    }
+    return null;
+  }
+
+  function visit(node) {
+    if (!node || typeof node !== "object") return;
+    if (seen.has(node)) return;
+    seen.add(node);
+
+    if (Array.isArray(node)) { node.forEach(visit); return; }
+
+    const p = pathIn(node);
+    const tier = tierOf(node.severity ?? node.level ?? node.sev ?? node.risk);
+
+    if (p && tier && (node.rule || node.rule_id || node.id || node.message ||
+                      node.title || node.description || node.check)) {
+      findings.push({
+        path: p.replace(/^\.?\//, ""),
+        tier,
+        rule: String(node.rule_id || node.rule || node.id || node.check || "RULE"),
+        title: String(node.title || node.message || node.description || node.name || "Finding"),
+        line: node.line ?? node.lineno ?? node.line_number ?? null,
+        evidence: node.evidence ?? node.snippet ?? node.match ?? null,
+        fix: node.remediation ?? node.fix ?? node.advice ?? null
+      });
+    } else if (p && (node.type === "file" || node.is_file || node.size != null ||
+                     node.bytes != null || node.lines != null || node.hash != null ||
+                     node.sha256 != null)) {
+      const key = p.replace(/^\.?\//, "");
+      if (!files.has(key)) files.set(key, { path: key, size: Number(node.size ?? node.bytes ?? node.lines ?? 0) });
+    }
+
+    for (const k in node) visit(node[k]);
+  }
+
+  visit(raw);
+
+  // Files can be implied purely by the findings that reference them.
+  for (const f of findings) if (!files.has(f.path)) files.set(f.path, { path: f.path, size: 0 });
+
+  return { files: [...files.values()], findings };
+}
+
+function readScore(raw) {
+  let score = null, grade = null, root = null;
+  const seen = new Set();
+  (function dig(n) {
+    if (!n || typeof n !== "object" || seen.has(n)) return;
+    seen.add(n);
+    if (Array.isArray(n)) { n.forEach(dig); return; }
+    for (const k in n) {
+      const v = n[k];
+      const lk = k.toLowerCase();
+      if (score === null && typeof v === "number" && v >= 0 && v <= 100 &&
+          (lk === "score" || lk === "security_score" || lk === "total_score")) score = Math.round(v);
+      if (grade === null && typeof v === "string" && v.length <= 3 && /^[A-F][+-]?$/.test(v) && lk.includes("grade")) grade = v;
+      if (root === null && typeof v === "string" && (lk === "root" || lk === "scan_root" || lk === "target")) root = v;
+      dig(v);
+    }
+  })(raw);
+  return { score, grade, root };
+}
+
+function buildScene(raw) {
+  const { files, findings } = harvest(raw);
+  if (!files.length) throw new Error("No files or findings found in that JSON.");
+
+  const meta = readScore(raw);
+
+  // attach findings to files
+  const byPath = new Map(files.map(f => [f.path, Object.assign({ findings: [], tier: "clean" }, f)]));
+  for (const fd of findings) {
+    const rec = byPath.get(fd.path);
+    if (!rec) continue;
+    rec.findings.push(fd);
+    if (TIER_RANK[fd.tier] > TIER_RANK[rec.tier]) rec.tier = fd.tier;
+  }
+
+  // group into layers by folder depth
+  const layerMap = new Map();
+  for (const rec of byPath.values()) {
+    const parts = rec.path.split("/").filter(Boolean);
+    const dir = parts.slice(0, -1).join("/") || ".";
+    const depth = parts.length - 1;
+    if (!layerMap.has(depth)) layerMap.set(depth, { depth, dirs: new Set(), files: [] });
+    const L = layerMap.get(depth);
+    L.dirs.add(dir);
+    L.files.push(rec);
+  }
+
+  const layers = [...layerMap.values()].sort((a, b) => a.depth - b.depth);
+  layers.forEach(L => {
+    L.files.sort((a, b) => TIER_RANK[b.tier] - TIER_RANK[a.tier] || a.path.localeCompare(b.path));
+    L.label = L.dirs.size === 1 ? [...L.dirs][0] : `depth ${L.depth} · ${L.dirs.size} folders`;
+  });
+
+  // fall back to a computed score when the JSON has none
+  let score = meta.score;
+  if (score === null) {
+    const w = { crit: 18, high: 9, med: 3, low: 1 };
+    score = Math.max(0, 100 - findings.reduce((s, f) => s + (w[f.tier] || 0), 0));
+  }
+
+  return {
+    layers,
+    files: [...byPath.values()],
+    findings: findings.sort((a, b) => TIER_RANK[b.tier] - TIER_RANK[a.tier]),
+    score,
+    grade: meta.grade || gradeFor(score),
+    root: meta.root || ""
+  };
+}
+
+function gradeFor(s) {
+  return s >= 97 ? "A+" : s >= 93 ? "A" : s >= 85 ? "B" : s >= 75 ? "C" : s >= 60 ? "D" : "F";
+}
+
+/* ==================================================================
+   2. Geometry — folders become plates, files become blocks
+   ================================================================== */
+
+const BASE = 460;      // side length of the bottom plate
+const GAP  = 62;       // vertical distance between layers
+const TAPER = 0.155;   // how much each layer narrows
+
+function layout(sc) {
+  boxes = [];
+  const n = sc.layers.length;
+
+  sc.layers.forEach((L, i) => {
+    const side = BASE * Math.max(0.24, 1 - TAPER * i);
+    const y = i * GAP;
+
+    boxes.push({
+      kind: "plate",
+      layer: L,
+      x: 0, y: y, z: 0,
+      w: side, h: 7, d: side,
+      color: COLOR.plate
+    });
+
+    const cols = Math.max(1, Math.ceil(Math.sqrt(L.files.length)));
+    const rows = Math.ceil(L.files.length / cols);
+    const cell = side / Math.max(cols, rows);
+    const bw = cell * 0.62;
+
+    L.files.forEach((f, k) => {
+      const cx = k % cols, cz = Math.floor(k / cols);
+      const px = (cx - (cols - 1) / 2) * cell;
+      const pz = (cz - (rows - 1) / 2) * cell;
+      const risk = f.findings.length;
+      const bh = 11 + Math.min(38, risk * 13);
+
+      boxes.push({
+        kind: "file",
+        file: f,
+        layerIndex: i,
+        x: px, y: y + 7 + bh / 2, z: pz,
+        w: bw, h: bh, d: bw,
+        color: TIER_COLOR[f.tier]
+      });
+    });
+  });
+
+  const top = (n - 1) * GAP;
+  boxes.forEach(b => b.y -= top / 2);   // centre the stack vertically
+}
+
+/* ==================================================================
+   3. Projection and painting
+   ================================================================== */
+
+let W = 0, H = 0, DPR = 1;
+
+function resize() {
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  W = cv.clientWidth; H = cv.clientHeight;
+  cv.width = Math.round(W * DPR);
+  cv.height = Math.round(H * DPR);
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  draw();
+}
+
+function rotate(p) {
+  const cy = Math.cos(cam.yaw), sy = Math.sin(cam.yaw);
+  const x1 = p.x * cy - p.z * sy;
+  const z1 = p.x * sy + p.z * cy;
+  const cp = Math.cos(cam.pitch), sp = Math.sin(cam.pitch);
+  const y2 = p.y * cp - z1 * sp;
+  const z2 = p.y * sp + z1 * cp;
+  return { x: x1, y: y2, z: z2 };
+}
+
+function project(p) {
+  const r = cam.dist + r_z(p);
+  const s = cam.focal / Math.max(60, r);
+  const q = rotate(p);
+  const rr = cam.dist + q.z;
+  const ss = cam.focal / Math.max(60, rr);
+  return { x: W / 2 + q.x * ss, y: H / 2 - q.y * ss, depth: rr };
+}
+
+function r_z(p) { return rotate(p).z; }
+
+const CORNERS = [
+  [-1,-1,-1],[ 1,-1,-1],[ 1, 1,-1],[-1, 1,-1],
+  [-1,-1, 1],[ 1,-1, 1],[ 1, 1, 1],[-1, 1, 1]
+];
+
+const FACES = [
+  { idx: [4,5,6,7], n: [ 0, 0, 1] },
+  { idx: [1,0,3,2], n: [ 0, 0,-1] },
+  { idx: [5,1,2,6], n: [ 1, 0, 0] },
+  { idx: [0,4,7,3], n: [-1, 0, 0] },
+  { idx: [3,7,6,2], n: [ 0, 1, 0] },
+  { idx: [0,1,5,4], n: [ 0,-1, 0] }
+];
+
+const LIGHT = (() => { const v = [-0.45, 0.82, 0.36]; const m = Math.hypot(...v); return v.map(c => c / m); })();
+
+function shade(hex, amt) {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  const f = c => Math.max(0, Math.min(255, Math.round(c * amt)));
+  return `rgb(${f(r)},${f(g)},${f(b)})`;
+}
+
+function boxGeometry(b) {
+  const pts = CORNERS.map(c => project({
+    x: b.x + c[0] * b.w / 2,
+    y: b.y + c[1] * b.h / 2,
+    z: b.z + c[2] * b.d / 2
+  }));
+  return pts;
+}
+
+function paintBox(b, opts) {
+  opts = opts || {};
+  const pts = boxGeometry(b);
+
+  for (const f of FACES) {
+    const q = f.idx.map(i => pts[i]);
+    // backface cull via signed area of the projected quad
+    let area = 0;
+    for (let i = 0; i < 4; i++) {
+      const a = q[i], c = q[(i + 1) % 4];
+      area += (a.x * c.y - c.x * a.y);
+    }
+    if (area >= 0) continue;
+
+    const nr = rotate({ x: f.n[0], y: f.n[1], z: f.n[2] });
+    const nl = Math.hypot(nr.x, nr.y, nr.z) || 1;
+    const lam = (nr.x / nl) * LIGHT[0] + (nr.y / nl) * LIGHT[1] + (nr.z / nl) * LIGHT[2];
+    let amt = 0.52 + 0.62 * Math.max(0, lam);
+    if (opts.lift) amt *= 1.28;
+
+    ctx.beginPath();
+    ctx.moveTo(q[0].x, q[0].y);
+    for (let i = 1; i < 4; i++) ctx.lineTo(q[i].x, q[i].y);
+    ctx.closePath();
+    ctx.fillStyle = shade(b.color, amt);
+    ctx.fill();
+
+    if (b.kind === "plate") {
+      ctx.strokeStyle = "rgba(127,157,185,.34)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    } else if (opts.lift) {
+      ctx.strokeStyle = "rgba(255,255,255,.85)";
+      ctx.lineWidth = 1.4;
+      ctx.stroke();
+    }
+  }
+  return pts;
+}
+
+function centroidDepth(b) {
+  return rotate({ x: b.x, y: b.y, z: b.z }).z;
+}
+
+function drawGround() {
+  const y = -((scene ? scene.layers.length - 1 : 0) * GAP) / 2 - 46;
+  const half = BASE * 0.95;
+  const step = half / 6;
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = "rgba(27,44,69,.9)";
+  for (let i = -6; i <= 6; i++) {
+    const a = project({ x: i * step, y, z: -half });
+    const b = project({ x: i * step, y, z:  half });
+    const c = project({ x: -half, y, z: i * step });
+    const d = project({ x:  half, y, z: i * step });
+    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(c.x, c.y); ctx.lineTo(d.x, d.y); ctx.stroke();
+  }
+}
+
+/* the signature: a hairline callout dropping from the hovered block
+   to the ground plane, like a survey instrument taking a reading */
+function drawCallout(b) {
+  const groundY = -((scene.layers.length - 1) * GAP) / 2 - 46;
+  const top = project({ x: b.x, y: b.y + b.h / 2, z: b.z });
+  const foot = project({ x: b.x, y: groundY, z: b.z });
+
+  ctx.setLineDash([3, 4]);
+  ctx.strokeStyle = "rgba(220,230,242,.5)";
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(top.x, top.y); ctx.lineTo(foot.x, foot.y); ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.beginPath(); ctx.arc(foot.x, foot.y, 2.6, 0, Math.PI * 2);
+  ctx.fillStyle = "rgba(220,230,242,.75)"; ctx.fill();
+
+  const label = b.file.path;
+  const sub = b.file.findings.length
+    ? `${b.file.findings.length} finding${b.file.findings.length > 1 ? "s" : ""}`
+    : "clean";
+
+  ctx.font = "600 12px ui-monospace, SF Mono, Menlo, monospace";
+  const tw = Math.max(ctx.measureText(label).width, ctx.measureText(sub).width) + 18;
+  let lx = top.x + 14, ly = top.y - 42;
+  if (lx + tw > W - 12) lx = top.x - 14 - tw;
+  if (ly < 8) ly = 8;
+
+  ctx.fillStyle = "rgba(11,19,31,.92)";
+  ctx.fillRect(lx, ly, tw, 40);
+  ctx.strokeStyle = "rgba(127,157,185,.5)";
+  ctx.lineWidth = 1;
+  ctx.strokeRect(lx + .5, ly + .5, tw - 1, 39);
+
+  ctx.beginPath();
+  ctx.moveTo(top.x, top.y);
+  ctx.lineTo(lx < top.x ? lx + tw : lx, ly + 20);
+  ctx.strokeStyle = "rgba(127,157,185,.5)";
+  ctx.stroke();
+
+  ctx.fillStyle = COLOR.ink;
+  ctx.fillText(label, lx + 9, ly + 17);
+  ctx.font = "11px ui-monospace, SF Mono, Menlo, monospace";
+  ctx.fillStyle = b.file.findings.length ? b.color : COLOR.muted;
+  ctx.fillText(sub, lx + 9, ly + 32);
+}
+
+function drawLayerLabels(order) {
+  ctx.font = "10px ui-monospace, SF Mono, Menlo, monospace";
+  for (const b of order) {
+    if (b.kind !== "plate") continue;
+    const edge = project({ x: -b.w / 2, y: b.y, z: b.d / 2 + 10 });
+    if (edge.x < -60 || edge.x > W + 60) continue;
+    ctx.fillStyle = "rgba(120,140,166,.85)";
+    ctx.fillText(b.layer.label.toUpperCase(), edge.x, edge.y + 4);
+  }
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  if (!scene) return;
+
+  drawGround();
+
+  const order = boxes.slice().sort((a, b) => centroidDepth(b) - centroidDepth(a));
+  for (const b of order) {
+    const lift = (b === hovered || b === selected);
+    paintBox(b, { lift });
+  }
+
+  drawLayerLabels(order);
+  if (hovered && hovered.kind === "file") drawCallout(hovered);
+}
+
+/* ==================================================================
+   4. Picking
+   ================================================================== */
+
+function inPoly(px, py, q) {
+  let hit = false;
+  for (let i = 0, j = q.length - 1; i < q.length; j = i++) {
+    if (((q[i].y > py) !== (q[j].y > py)) &&
+        (px < (q[j].x - q[i].x) * (py - q[i].y) / (q[j].y - q[i].y) + q[i].x)) hit = !hit;
+  }
+  return hit;
+}
+
+function pick(px, py) {
+  const order = boxes.filter(b => b.kind === "file")
+                     .sort((a, b) => centroidDepth(a) - centroidDepth(b)); // near first
+  for (const b of order) {
+    const pts = boxGeometry(b);
+    for (const f of FACES) {
+      const q = f.idx.map(i => pts[i]);
+      if (inPoly(px, py, q)) return b;
+    }
+  }
+  return null;
+}
+
+/* ==================================================================
+   5. Interaction
+   ================================================================== */
+
+let dragging = false, lastX = 0, lastY = 0, moved = 0;
+
+cv.addEventListener("pointerdown", e => {
+  dragging = true; moved = 0;
+  lastX = e.clientX; lastY = e.clientY;
+  cv.classList.add("dragging");
+  cv.setPointerCapture(e.pointerId);
+});
+
+cv.addEventListener("pointermove", e => {
+  const r = cv.getBoundingClientRect();
+  if (dragging) {
+    const dx = e.clientX - lastX, dy = e.clientY - lastY;
+    moved += Math.abs(dx) + Math.abs(dy);
+    cam.yaw += dx * 0.006;
+    cam.pitch = Math.max(-0.15, Math.min(1.25, cam.pitch + dy * 0.005));
+    lastX = e.clientX; lastY = e.clientY;
+    draw();
+    return;
+  }
+  const h = pick(e.clientX - r.left, e.clientY - r.top);
+  if (h !== hovered) { hovered = h; draw(); }
+});
+
+addEventListener("pointerup", e => {
+  if (!dragging) return;
+  dragging = false;
+  cv.classList.remove("dragging");
+  if (moved < 5 && hovered) select(hovered.file);
+});
+
+cv.addEventListener("wheel", e => {
+  e.preventDefault();
+  cam.dist = Math.max(320, Math.min(2400, cam.dist + e.deltaY * 0.9));
+  draw();
+}, { passive: false });
+
+cv.addEventListener("keydown", e => {
+  const k = e.key;
+  if (k === "ArrowLeft")  { cam.yaw -= 0.09; draw(); e.preventDefault(); }
+  if (k === "ArrowRight") { cam.yaw += 0.09; draw(); e.preventDefault(); }
+  if (k === "ArrowUp")    { cam.pitch = Math.min(1.25, cam.pitch + 0.06); draw(); e.preventDefault(); }
+  if (k === "ArrowDown")  { cam.pitch = Math.max(-0.15, cam.pitch - 0.06); draw(); e.preventDefault(); }
+  if (k === "+" || k === "=") { cam.dist = Math.max(320, cam.dist - 70); draw(); }
+  if (k === "-")              { cam.dist = Math.min(2400, cam.dist + 70); draw(); }
+});
+
+/* ==================================================================
+   6. Rail
+   ================================================================== */
+
+function esc(s) {
+  return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+
+function select(file) {
+  selected = boxes.find(b => b.kind === "file" && b.file === file) || null;
+  const d = document.getElementById("detail");
+
+  if (!file) {
+    d.innerHTML = '<div class="path">Nothing selected</div><p>Click any block in the pyramid to inspect the file it represents.</p>';
+    draw();
+    return;
+  }
+
+  const rows = file.findings.map(f => `
+    <div class="meta" style="color:${TIER_COLOR[f.tier]}">${esc(f.rule)} · ${esc(f.tier).toUpperCase()}${f.line ? " · line " + esc(f.line) : ""}</div>
+    <p style="color:var(--ink)">${esc(f.title)}</p>
+    ${f.evidence ? `<p style="font-family:var(--mono);font-size:11px">${esc(f.evidence)}</p>` : ""}
+    ${f.fix ? `<p>${esc(f.fix)}</p>` : ""}
+  `).join("");
+
+  d.innerHTML =
+    `<div class="path">${esc(file.path)}</div>` +
+    `<div class="meta">${file.findings.length ? file.findings.length + " finding(s)" : "no findings"}</div>` +
+    (rows || "<p>This file is clean.</p>");
+
+  document.querySelectorAll(".row").forEach(r => r.classList.toggle("on", r.dataset.path === file.path));
+  draw();
+}
+
+function paintRail(sc) {
+  const cnt = { crit: 0, high: 0, med: 0, low: 0 };
+  sc.findings.forEach(f => cnt[f.tier]++);
+  document.getElementById("c-crit").textContent = cnt.crit;
+  document.getElementById("c-high").textContent = cnt.high;
+  document.getElementById("c-med").textContent  = cnt.med;
+  document.getElementById("c-low").textContent  = cnt.low;
+
+  document.getElementById("score").innerHTML = sc.score + "<span>/100</span>";
+  document.getElementById("grade").textContent =
+    sc.grade + " · " + sc.files.length + " files · " + sc.layers.length + " layers";
+  document.getElementById("rootpath").textContent = sc.root;
+
+  document.getElementById("fh").textContent = `Findings (${sc.findings.length})`;
+
+  const fl = document.getElementById("findings");
+  fl.innerHTML = sc.findings.length
+    ? sc.findings.map(f => `
+        <button class="row" data-path="${esc(f.path)}" style="border-left-color:${TIER_COLOR[f.tier]}">
+          <span class="rid"><span>${esc(f.rule)}</span><span style="color:${TIER_COLOR[f.tier]}">${esc(f.tier).toUpperCase()}</span></span>
+          ${esc(f.title)}
+          <span class="rwhere">${esc(f.path)}${f.line ? ":" + esc(f.line) : ""}</span>
+        </button>`).join("")
+    : `<div style="color:var(--muted);font-size:12px">Nothing flagged. Every block is green.</div>`;
+
+  fl.querySelectorAll(".row").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const file = sc.files.find(f => f.path === btn.dataset.path);
+      if (file) { select(file); focusOn(file); }
+    });
+  });
+
+  const max = Math.max(...sc.layers.map(l => l.files.length));
+  document.getElementById("layers").innerHTML = sc.layers.map(l => `
+    <div class="layer">
+      <b>${esc(l.label)}</b>
+      <span class="bar"><i style="width:${Math.round(l.files.length / max * 100)}%"></i></span>
+      <span class="n">${l.files.length}</span>
+    </div>`).join("");
+}
+
+/* swing the camera round so the chosen block faces the viewer */
+function focusOn(file) {
+  const b = boxes.find(x => x.kind === "file" && x.file === file);
+  if (!b) return;
+  const target = Math.atan2(b.x, b.z) - 0.5;
+  if (reduceMotion) { cam.yaw = target; draw(); return; }
+  const from = cam.yaw, t0 = performance.now();
+  let delta = target - from;
+  while (delta > Math.PI) delta -= Math.PI * 2;
+  while (delta < -Math.PI) delta += Math.PI * 2;
+  (function step(now) {
+    const k = Math.min(1, (now - t0) / 460);
+    cam.yaw = from + delta * (1 - Math.pow(1 - k, 3));
+    draw();
+    if (k < 1) requestAnimationFrame(step);
+  })(t0);
+}
+
+/* ==================================================================
+   7. Loading
+   ================================================================== */
+
+function load(raw) {
+  scene = buildScene(raw);
+  layout(scene);
+  paintRail(scene);
+  selected = null; hovered = null;
+  select(null);
+  body.classList.remove("no-data");
+  draw();
+}
+
+function loadText(txt) {
+  try {
+    load(JSON.parse(txt));
+  } catch (err) {
+    body.classList.add("no-data");
+    document.querySelector(".empty h2").textContent = "That file did not load";
+    document.querySelector(".empty p").innerHTML =
+      esc(err.message) + "<br><br>Regenerate it with <code>pyrasec pyramid . &gt; pyramid.json</code> and try again.";
+  }
+}
+
+document.getElementById("pick").addEventListener("change", e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = () => loadText(r.result);
+  r.readAsText(f);
+});
+
+["dragover", "drop"].forEach(t => addEventListener(t, e => e.preventDefault()));
+addEventListener("drop", e => {
+  const f = e.dataTransfer.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = () => loadText(r.result);
+  r.readAsText(f);
+});
+
+document.getElementById("reset").addEventListener("click", () => { cam = Object.assign({}, camDefault); draw(); });
+
+document.getElementById("spin").addEventListener("click", e => {
+  spinning = !spinning;
+  e.target.textContent = "Spin: " + (spinning ? "on" : "off");
+  if (spinning) requestAnimationFrame(tick);
+});
+
+function tick(now) {
+  if (!spinning) return;
+  cam.yaw += 0.0035;
+  draw();
+  requestAnimationFrame(tick);
+}
+
+document.getElementById("shot").addEventListener("click", () => {
+  const a = document.createElement("a");
+  a.download = "pyrasec-pyramid.png";
+  a.href = cv.toDataURL("image/png");
+  a.click();
+});
+
+/* ==================================================================
+   8. Sample data — mirrors the CLI's self-scan
+   ================================================================== */
+
+const SAMPLE = {
+  root: "~/pyrasec-v1.0.0/pyrasec",
+  score: 98,
+  grade: "A+",
+  files: [
+    "README.md", "pyproject.toml", "LICENSE", ".gitignore", "Makefile",
+    "pyrasec/__init__.py", "pyrasec/__main__.py", "pyrasec/cli.py", "pyrasec/service.py",
+    "pyrasec/core/__init__.py", "pyrasec/core/models.py", "pyrasec/core/walker.py",
+    "pyrasec/core/cache.py", "pyrasec/core/score.py",
+    "pyrasec/engine/__init__.py", "pyrasec/engine/scanner.py", "pyrasec/engine/registry.py",
+    "pyrasec/rules/__init__.py", "pyrasec/rules/secrets.py", "pyrasec/rules/filesystem.py",
+    "pyrasec/rules/git.py", "pyrasec/rules/docker.py", "pyrasec/rules/k8s.py",
+    "pyrasec/rules/terraform.py", "pyrasec/rules/web.py", "pyrasec/rules/deps.py",
+    "pyrasec/report/__init__.py", "pyrasec/report/html.py", "pyrasec/report/sarif.py",
+    "pyrasec/report/csv.py",
+    "pyrasec/viz/__init__.py", "pyrasec/viz/pyramid.py", "pyrasec/viz/tree.py",
+    "pyrasec/viz/heatmap.py"
+  ].map(p => ({ path: p, type: "file", size: 1 })),
+  findings: [
+    {
+      rule_id: "SEC005", severity: "low", path: "README.md", line: 61,
+      title: "Possible payment card number",
+      evidence: "411111******1111",
+      remediation: "Remove cardholder data from source and storage you do not need to hold."
+    },
+    {
+      rule_id: "SEC005", severity: "low", path: "pyrasec/rules/secrets.py", line: 458,
+      title: "Possible payment card number",
+      evidence: "411111******1111",
+      remediation: "Remove cardholder data from source and storage you do not need to hold."
+    }
+  ]
+};
+
+document.getElementById("sample").addEventListener("click", () => load(SAMPLE));
+
+/* ==================================================================
+   9. Boot
+   ================================================================== */
+
+addEventListener("resize", resize);
+body.classList.add("no-data");
+resize();
+
+// If the page is served over http (python3 -m http.server), pick up a
+// sibling pyramid.json automatically. Silently ignored on file://.
+fetch("pyramid.json")
+  .then(r => r.ok ? r.json() : Promise.reject())
+  .then(load)
+  .catch(() => {});
+</script>
